@@ -1,0 +1,44 @@
+services:
+  backend:
+    build:
+      context: ./docker/backend
+      dockerfile: Dockerfile
+    volumes:
+      - .:/go/src/app
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=${DB_HOST}
+      - TZ=Asia/Tokyo
+    container_name: sqlx-xo-api
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d
+      - ./docker/db/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - TZ=Asia/Tokyo
+    container_name: sqlx-xo-db
+    healthcheck:
+      test: exit 0
+      # すぐに結果が出るようにタイミングを調整する
+      interval: 1s
+      timeout: 1s
+      retries: 3
+      start_period: 1s
