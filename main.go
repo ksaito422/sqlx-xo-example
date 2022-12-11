@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -28,10 +30,14 @@ func main() {
 		return
 	}
 
+	// SQLのタイムアウト設定
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	// インスタンスを作成
 	e := echo.New()
 
-	api.NewRouter(e, db)
+	api.NewRouter(e, ctx, db)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }
