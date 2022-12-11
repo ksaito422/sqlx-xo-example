@@ -1,12 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 
 	"github.com/saitooooooo/sqlx-xo-example/src/api"
@@ -22,7 +22,7 @@ var (
 
 func main() {
 	// DBコネクション
-	db, err := sql.Open("mysql", dbConn)
+	db, err := sqlx.Connect("mysql", dbConn)
 	if err != nil {
 		log.Println("fail to connect DB")
 		return
